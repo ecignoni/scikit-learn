@@ -1151,6 +1151,42 @@ def sigmoid_kernel(X, Y=None, gamma=None, coef0=1):
     return K
 
 
+def matern12_kernel(X, Y=None, gamma=None):
+    X, Y = check_pairwise_arrays(X, Y)
+    if gamma is None:
+        gamma = 1.0 / X.shape[1]
+
+    K = euclidean_distances(X, Y, squared=False)
+    K *= -gamma
+    np.exp(K, K) # exponentiate K in-place
+
+    return K
+
+
+def matern32_kernel(X, Y=None, gamma=None):
+    X, Y = check_pairwise_arrays(X, Y)
+    if gamma is None:
+        gamma = 1.0 / X.shape[1]
+
+    K = euclidean_distances(X, Y, squared=False)
+    K *= gamma * math.sqrt(3)
+    K = (1. + K) * np.exp(-K)
+
+    return K
+
+
+def matern52_kernel(X, Y=None, gamma=None):
+    X, Y = check_pairwise_arrays(X, Y)
+    if gamma is None:
+        gamma = 1.0 / X.shape[1]
+
+    K = euclidean_distances(X, Y, squared=False)
+    K *= gamma * math.sqrt(5)
+    K = (1. + K + K**2/3.) * np.exp(-K)
+
+    return K
+
+
 def rbf_kernel(X, Y=None, gamma=None):
     """
     Compute the rbf (gaussian) kernel between X and Y::
@@ -1922,6 +1958,9 @@ PAIRWISE_KERNEL_FUNCTIONS = {
     "laplacian": laplacian_kernel,
     "sigmoid": sigmoid_kernel,
     "cosine": cosine_similarity,
+    "matern12": matern12,
+    "matern32": matern32,
+    "matern52": matern52,
 }
 
 
@@ -1945,6 +1984,9 @@ def kernel_metrics():
       'laplacian'       sklearn.pairwise.laplacian_kernel
       'sigmoid'         sklearn.pairwise.sigmoid_kernel
       'cosine'          sklearn.pairwise.cosine_similarity
+      'matern12'        sklearn.pairwise.matern12
+      'matern32'        sklearn.pairwise.matern32
+      'matern52'        sklearn.pairwise.matern52
       ===============   ========================================
 
     Read more in the :ref:`User Guide <metrics>`.
@@ -1962,6 +2004,9 @@ KERNEL_PARAMS = {
     "rbf": frozenset(["gamma"]),
     "laplacian": frozenset(["gamma"]),
     "sigmoid": frozenset(["gamma", "coef0"]),
+    "matern12": frozenset(["gamma"]),
+    "matern32": frozenset(["gamma"]),
+    "matern52": frozenset(["gamma"]),
 }
 
 
